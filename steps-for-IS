@@ -1,0 +1,95 @@
+vault-new-01 : 172.31.93.228
+vault-new-02 : 172.31.85.36
+vault-new-03 : 172.31.91.105
+
+
+export VAULT_ADDR='http://172.31.81.239:8200'
+
+vault login root token 
+
+vault operator raft list-peers 
+
+storage "raft" {
+  path    = "./vault/data"
+  node_id = "node1"
+}
+
+listener "tcp" {
+  address     = "172.31.93.228:8200"
+tls_disable =true
+#tls_cert_file="/Users/**/bin/test1/certificate/example.crt"
+#tls_key_file="/Users/**/bin/test1/certificate/example.key"
+
+}
+
+api_addr = "https://172.31.93.228:8200"
+cluster_addr = "https://172.31.93.228:8201"
+ui = true
+license_path = "./.license" 
+disable_mlock = true 
+raw_storage_endpoint=true
+log_level="trace"
+
+----------------
+export VAULT_ADDR='http://172.31.85.36:8200'
+
+vault operator raft join http://172.31.93.228:8200
+
+vault operator unseal <leader unsealkey >
+
+node 02 
+
+storage "raft" {
+  path    = "./vault/data"
+  node_id = "node2"
+}
+
+listener "tcp" {
+  address     = "172.31.85.36:8200"
+tls_disable =true
+#tls_cert_file="/Users/**/bin/test1/certificate/example.crt"
+#tls_key_file="/Users/**/bin/test1/certificate/example.key"
+
+}
+
+api_addr = "https://172.31.85.36:8200"
+cluster_addr = "https://172.31.85.36:8201"
+ui = true
+license_path = "./.license" 
+disable_mlock = true 
+raw_storage_endpoint=true
+log_level="trace"
+
+
+--------
+
+node 03 
+
+export VAULT_ADDR='http://172.31.91.105:8200'
+
+vault operator raft join http://172.31.93.228:8200
+
+vault operator unseal 
+
+
+
+storage "raft" {
+  path    = "./vault/data"
+  node_id = "node3"
+}
+
+listener "tcp" {
+  address     = "172.31.91.105:8200"
+tls_disable =true
+#tls_cert_file="/Users/**/bin/test1/certificate/example.crt"
+#tls_key_file="/Users/**/bin/test1/certificate/example.key"
+
+}
+
+api_addr = "https://172.31.91.105:8200"
+cluster_addr = "https://172.31.91.105:8201"
+ui = true
+license_path = "./.license" 
+disable_mlock = true 
+raw_storage_endpoint=true
+log_level="trace"
